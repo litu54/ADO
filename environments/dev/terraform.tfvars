@@ -9,7 +9,7 @@ rgk = {
 sa = {
 
   sa1 = {
-    name                     = "stgdev"
+    name                     = "stgdev13245667"
     resource_group_name      = "rg-dev"
     location                 = "central India"
     account_tier             = "Standard"
