@@ -1,0 +1,3 @@
+variable "rgk" { }
+
+variable "stk" {}
