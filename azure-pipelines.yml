@@ -180,3 +180,32 @@ steps:
       cd "$(System.DefaultWorkingDirectory)/environments/dev"
 
       terraform plan
+
+
+# ============================================================
+# Terraform Apply - DEV
+# ============================================================
+
+- task: AzureCLI@2
+  displayName: 'Terraform Apply'
+  inputs:
+    azureSubscription: 'ado-terraform-azure'
+    scriptType: 'bash'
+    scriptLocation: 'inlineScript'
+    addSpnToEnvironment: true
+
+    inlineScript: |
+
+      echo "Setting Terraform OIDC authentication..."
+
+      export ARM_USE_OIDC=true
+      export ARM_CLIENT_ID="$servicePrincipalId"
+      export ARM_OIDC_TOKEN="$idToken"
+      export ARM_TENANT_ID="$tenantId"
+      export ARM_SUBSCRIPTION_ID="5683bf24-29eb-4665-a4aa-1f2e5f6e28a2"
+
+      cd "$(System.DefaultWorkingDirectory)/environments/dev"
+
+      echo "Running Terraform Apply..."
+
+      terraform apply -auto-approve
