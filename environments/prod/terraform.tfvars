@@ -6,7 +6,7 @@ prod = {
 }
 }
 
-stk = {
+sa = {
 
 sa1 = {
     name = "stgprod"

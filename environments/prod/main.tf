@@ -5,5 +5,5 @@ module "resource_group" {
 
 module "storage_account" {
     source = "../../modules/azurerm_storage_account"
-     stg = var.stk
+     stg = var.sa
 }

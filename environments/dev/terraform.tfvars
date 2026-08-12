@@ -6,7 +6,7 @@ dev = {
 }
 }
 
-stk = {
+sa = {
 
 sa1 = {
     name = "stgdev"
