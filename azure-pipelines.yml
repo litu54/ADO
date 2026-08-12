@@ -63,10 +63,10 @@ steps:
 - script: |
     cd "$(System.DefaultWorkingDirectory)/environments/dev"
 
-    echo "Running TFLint..."
-
     tflint --init
-    tflint
+
+    tflint --force
+
   displayName: 'TFLint'
 
 
