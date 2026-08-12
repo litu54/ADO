@@ -31,34 +31,29 @@ steps:
   displayName: 'Terraform Format Check'
 
 
-# Azure Login using Service Connection
+# Azure Login + Terraform Init
 - task: AzureCLI@2
-  displayName: 'Azure Login'
+  displayName: 'Azure Login + Terraform Init'
   inputs:
     azureSubscription: 'ado-terraform-azure'
     scriptType: 'bash'
     scriptLocation: 'inlineScript'
+    addSpnToEnvironment: true
     inlineScript: |
+
       echo "Azure authentication successful"
+
       az account show
 
+      echo "Setting Terraform OIDC authentication..."
 
-# Terraform Init - DEV
-- script: |
-    terraform init
-  workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
-  displayName: 'Terraform Init'
+      export ARM_USE_OIDC=true
+      export ARM_CLIENT_ID="$servicePrincipalId"
+      export ARM_OIDC_TOKEN="$idToken"
+      export ARM_TENANT_ID="$tenantId"
 
+      echo "Running Terraform Init..."
 
-# Terraform Validate - DEV
-- script: |
-    terraform validate
-  workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
-  displayName: 'Terraform Validate'
+      cd "$(System.DefaultWorkingDirectory)/environments/dev"
 
-
-# Terraform Plan - DEV
-- script: |
-    terraform plan
-  workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
-  displayName: 'Terraform Plan'
+      terraform init
