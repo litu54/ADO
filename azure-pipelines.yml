@@ -31,6 +31,18 @@ steps:
   displayName: 'Terraform Format Check'
 
 
+# Azure Login using Service Connection
+- task: AzureCLI@2
+  displayName: 'Azure Login'
+  inputs:
+    azureSubscription: 'ado-terraform-azure'
+    scriptType: 'bash'
+    scriptLocation: 'inlineScript'
+    inlineScript: |
+      echo "Azure authentication successful"
+      az account show
+
+
 # Terraform Init - DEV
 - script: |
     terraform init
