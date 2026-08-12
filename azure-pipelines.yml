@@ -10,27 +10,43 @@ steps:
 
 - checkout: self
 
+# Install Terraform
 - script: |
     echo "Installing Terraform..."
     TERRAFORM_VERSION="1.15.8"
+
     wget -q https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip
+
     unzip -o terraform_${TERRAFORM_VERSION}_linux_amd64.zip
+
     sudo mv terraform /usr/local/bin/
+
     terraform version
   displayName: 'Install Terraform'
 
+
+# Terraform Format Check
 - script: |
     terraform fmt -check -recursive
   displayName: 'Terraform Format Check'
 
+
+# Terraform Init - DEV
 - script: |
     terraform init
+  workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
   displayName: 'Terraform Init'
 
+
+# Terraform Validate - DEV
 - script: |
     terraform validate
+  workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
   displayName: 'Terraform Validate'
 
+
+# Terraform Plan - DEV
 - script: |
     terraform plan
+  workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
   displayName: 'Terraform Plan'
