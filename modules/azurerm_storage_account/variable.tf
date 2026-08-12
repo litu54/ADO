@@ -1,4 +1,4 @@
-variable "stg"{
-    type = map(any)
-    description = "storage details"
+variable "stg" {
+  type        = map(any)
+  description = "storage details"
 }

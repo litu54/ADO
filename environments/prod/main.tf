@@ -1,6 +1,6 @@
 module "resource_group" {
-   source = "./../../modules/azurerm_resource_group"
-   rgk = var.rgk
+  source = "./../../modules/azurerm_resource_group"
+  rgk    = var.rgk
 }
 
 module "storage_account" {
