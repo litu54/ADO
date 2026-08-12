@@ -1,3 +1,3 @@
-variable "rgk" { }
+variable "rgk" {}
 
 variable "sa" {}
