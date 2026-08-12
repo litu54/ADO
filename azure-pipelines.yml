@@ -10,9 +10,14 @@ steps:
 
 - checkout: self
 
+
+# ============================================================
 # Install Terraform
+# ============================================================
+
 - script: |
     echo "Installing Terraform..."
+
     TERRAFORM_VERSION="1.15.8"
 
     wget -q https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip
@@ -25,13 +30,76 @@ steps:
   displayName: 'Install Terraform'
 
 
+# ============================================================
 # Terraform Format Check
+# ============================================================
+
 - script: |
     terraform fmt -check -recursive
   displayName: 'Terraform Format Check'
 
 
+# ============================================================
+# Install TFLint
+# ============================================================
+
+- script: |
+    echo "Installing TFLint..."
+
+    curl -sSLO https://github.com/terraform-linters/tflint/releases/latest/download/tflint_linux_amd64.zip
+
+    unzip -o tflint_linux_amd64.zip
+
+    sudo install -c -v tflint /usr/local/bin/
+
+    tflint --version
+  displayName: 'Install TFLint'
+
+
+# ============================================================
+# TFLint
+# ============================================================
+
+- script: |
+    cd "$(System.DefaultWorkingDirectory)/environments/dev"
+
+    echo "Running TFLint..."
+
+    tflint --init
+    tflint
+  displayName: 'TFLint'
+
+
+# ============================================================
+# Install tfsec
+# ============================================================
+
+- script: |
+    echo "Installing tfsec..."
+
+    curl -s https://raw.githubusercontent.com/aquasecurity/tfsec/master/scripts/install_linux.sh | bash
+
+    tfsec --version
+  displayName: 'Install tfsec'
+
+
+# ============================================================
+# tfsec Security Scan
+# ============================================================
+
+- script: |
+    cd "$(System.DefaultWorkingDirectory)/environments/dev"
+
+    echo "Running tfsec security scan..."
+
+    tfsec .
+  displayName: 'tfsec Security Scan'
+
+
+# ============================================================
 # Azure Login + Terraform Init
+# ============================================================
+
 - task: AzureCLI@2
   displayName: 'Azure Login + Terraform Init'
   inputs:
@@ -39,6 +107,7 @@ steps:
     scriptType: 'bash'
     scriptLocation: 'inlineScript'
     addSpnToEnvironment: true
+
     inlineScript: |
 
       echo "Azure authentication successful"
@@ -51,9 +120,63 @@ steps:
       export ARM_CLIENT_ID="$servicePrincipalId"
       export ARM_OIDC_TOKEN="$idToken"
       export ARM_TENANT_ID="$tenantId"
+      export ARM_SUBSCRIPTION_ID="5683bf24-29eb-4665-a4aa-1f2e5f6e28a2"
+
+      echo "Subscription ID:"
+      echo "$ARM_SUBSCRIPTION_ID"
 
       echo "Running Terraform Init..."
 
       cd "$(System.DefaultWorkingDirectory)/environments/dev"
 
       terraform init
+
+
+# ============================================================
+# Terraform Validate
+# ============================================================
+
+- task: AzureCLI@2
+  displayName: 'Terraform Validate'
+  inputs:
+    azureSubscription: 'ado-terraform-azure'
+    scriptType: 'bash'
+    scriptLocation: 'inlineScript'
+    addSpnToEnvironment: true
+
+    inlineScript: |
+
+      export ARM_USE_OIDC=true
+      export ARM_CLIENT_ID="$servicePrincipalId"
+      export ARM_OIDC_TOKEN="$idToken"
+      export ARM_TENANT_ID="$tenantId"
+      export ARM_SUBSCRIPTION_ID="5683bf24-29eb-4665-a4aa-1f2e5f6e28a2"
+
+      cd "$(System.DefaultWorkingDirectory)/environments/dev"
+
+      terraform validate
+
+
+# ============================================================
+# Terraform Plan
+# ============================================================
+
+- task: AzureCLI@2
+  displayName: 'Terraform Plan'
+  inputs:
+    azureSubscription: 'ado-terraform-azure'
+    scriptType: 'bash'
+    scriptLocation: 'inlineScript'
+    addSpnToEnvironment: true
+
+    inlineScript: |
+
+      export ARM_USE_OIDC=true
+      export ARM_CLIENT_ID="$servicePrincipalId"
+      export ARM_OIDC_TOKEN="$idToken"
+      export ARM_TENANT_ID="$tenantId"
+      export ARM_SUBSCRIPTION_ID="5683bf24-29eb-4665-a4aa-1f2e5f6e28a2"
+
+      cd "$(System.DefaultWorkingDirectory)/environments/dev"
+
+      terraform plan
